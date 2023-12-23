@@ -8,6 +8,10 @@ const io = new Server(server);
 
 const { PORT } = require("./config/server_config.js");
 const connect = require("./config/db_config.js");
+const Group = require("./models/group.js");
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // to set view engine as ejs
 app.set("view engine", "ejs");
@@ -34,10 +38,24 @@ io.on("connection", (socket) => {
 });
 
 app.get("/chat/:roomid/:user", async (req, res) => {
+    const group = await Group.findById(req.params.roomid);
     res.render("index", {
         roomid: req.params.roomid,
-        user: req.params.user
+        user: req.params.user,
+        groupname: group.name
     });
+});
+
+app.get("/group", async (req, res) => {
+    res.render("group");
+});
+
+app.post("/group", async (req, res) => {
+    console.log(req.body);
+    await Group.create({
+        name: req.body.name
+    });
+    res.redirect("/group");
 });
 
 server.listen(PORT, async () => {
