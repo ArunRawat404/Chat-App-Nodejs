@@ -6,7 +6,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = 3000;
+const { PORT } = require("./config/server_config.js");
+const connect = require("./config/db_config.js");
 
 // to set view engine as ejs
 app.set("view engine", "ejs");
@@ -39,10 +40,8 @@ app.get("/chat/:roomid/:user", async (req, res) => {
     });
 });
 
-app.get("/group", async (req, res) => {
-    res.render("group");
-});
-
 server.listen(PORT, async () => {
     console.log(`Server is up and running on PORT ${PORT}`);
+    await connect();
+    console.log("DB connected");
 });
