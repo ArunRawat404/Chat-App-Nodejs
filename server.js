@@ -62,9 +62,11 @@ app.get("/group", async (req, res) => {
 app.post("/group", async (req, res) => {
     console.log(req.body);
     await Group.create({
-        name: req.body.name
+        name: req.body.groupname
     });
-    res.redirect("/group");
+    const group = await Group.findOne({ name: req.body.groupname });
+    const groupId = group._id.toString();
+    res.redirect("/chat/" + groupId + "/" + req.body.username);
 });
 
 server.listen(PORT, async () => {
