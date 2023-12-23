@@ -8,7 +8,9 @@ const io = new Server(server);
 
 const { PORT } = require("./config/server_config.js");
 const connect = require("./config/db_config.js");
+
 const Group = require("./models/group.js");
+const Chat = require("./models/chat.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,8 +32,13 @@ io.on("connection", (socket) => {
         socket.join(data.roomid);
     });
 
-    socket.on("new_msg", (data) => {
+    socket.on("new_msg", async (data) => {
         console.log("Received new message", data);
+        const chat = await Chat.create({
+            roomid: data.roomid,
+            sender: data.sender,
+            content: data.message
+        });
         // will emit message to particular roomid
         io.to(data.roomid).emit("msg_rcvd", data);
     });
@@ -39,10 +46,12 @@ io.on("connection", (socket) => {
 
 app.get("/chat/:roomid/:user", async (req, res) => {
     const group = await Group.findById(req.params.roomid);
+    const chats = await Chat.find({ roomid: req.params.roomid });
     res.render("index", {
         roomid: req.params.roomid,
         user: req.params.user,
-        groupname: group.name
+        groupname: group.name,
+        previousmsgs: chats
     });
 });
 

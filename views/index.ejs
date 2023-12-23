@@ -14,7 +14,11 @@
     <input type="text" id="chat_box">
     <button id="send">Send</button>
     <ul id="msg_list">
-
+        <% for (let i=0; i < previousmsgs.length; i++) {%>
+            <li>
+                <%= previousmsgs[i].sender %> -> <%= previousmsgs[i].content %>
+            </li>
+            <% } %>
     </ul>
 
     <script src="/socket.io/socket.io.js"></script>
